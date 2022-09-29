@@ -1,13 +1,6 @@
 name: Build, test, package
 
-on:
-  push:
-    branches: [ main ]
-    paths-ignore:
-      - "*.md"
-      - "*.gif"
-  pull_request:
-    branches: [ main ]
+on: [push,pull_request]
 
 jobs:
   build-test-cxx:
