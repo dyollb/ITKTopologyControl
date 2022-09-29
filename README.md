@@ -34,7 +34,7 @@ Or using a custom mask (e.g. a sphere around a hole):
     itk.imwrite(skull_mask_closed, 'skull_mask_closed.mha')
 ```
 
-![Closing holes in skull](doc/close_holes_skull.gif)
+![Closing holes in skull](https://raw.githubusercontent.com/dyollb/ITKTopologyControl/main/doc/close_holes_skull.gif)
 
 ## Installation
 
