@@ -5,7 +5,7 @@ on:
     branches: [ main ]
     paths-ignore:
       - "*.md"
-      - "*.png"
+      - "*.gif"
   pull_request:
     branches: [ main ]
 

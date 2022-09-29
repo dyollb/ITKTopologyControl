@@ -28,8 +28,12 @@ Or using a custom mask (e.g. a sphere around a hole):
 
 ```python
     import itk
-    custom_mask = itk.imread('path/to/custom_mask.mha').astype(itk.UC)
     skull_mask = itk.imread('path/to/skull_with_holes.mha').astype(itk.US)
+
+    custom_mask = skull_mask.astype(itk.UC)
+    mask_np = itk.array_view_from_image(custom_mask)
+    mask_np[135:175, 100:130, 145:170] = 1
+
     skull_mask_closed = itk.fix_topology_carve_outside(skull_mask, MaskImage=custom_mask, Radius=5)
     itk.imwrite(skull_mask_closed, 'skull_mask_closed.mha')
 ```

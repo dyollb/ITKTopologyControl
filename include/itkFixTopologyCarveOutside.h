@@ -35,7 +35,7 @@ namespace itk
  * 2. erode/carve the dilated voxels from the "outside" while preserving the topology of the dilated region.
  *
  * The first step closes holes and the second returns as close as possible to the input mask, while ensuring that the
- * holes are not re-opened.
+ * holes are not re-opened. Instead of using a dilation, a custom mask can be provided (e.g. a sphere around a hole).
  *
  * This filter implements ideas from: Vanderhyde, James. "Topology control of volumetric data.", PhD dissertation,
  * Georgia Institute of Technology, 2007..
