@@ -77,8 +77,7 @@ FixTopologyCarveOutside<TInputImage, TOutputImage, TMaskImage>::PrepareData(Prog
   ImageRegionConstIterator<TInputImage> it(input_image, region);
   ImageRegionIterator<MaskImageType>    ot(m_PaddedOutput, region);
 
-  // Copy the input to the output, changing all foreground pixels to
-  // have value 1 in the process.
+  // mark the input mask as kHardForeground
   for (it.GoToBegin(), ot.GoToBegin(); !ot.IsAtEnd(); ++it, ++ot)
   {
     if (it.Get() == m_InsideValue)
@@ -86,6 +85,8 @@ FixTopologyCarveOutside<TInputImage, TOutputImage, TMaskImage>::PrepareData(Prog
       ot.Set(ePixelState::kHardForeground);
     }
   }
+
+  // compute distance map: used for priority queue
   auto distance_filter = SignedMaurerDistanceMapImageFilter<MaskImageType, RealImageType>::New();
   progress->RegisterInternalFilter(distance_filter, 0.1);
   distance_filter->SetInput(m_PaddedOutput);
@@ -182,6 +183,7 @@ FixTopologyCarveOutside<TInputImage, TOutputImage, TMaskImage>::ComputeThinImage
     mask_size += (pixel == kDilated) ? 1 : 0;
   }
 
+  // use max priority queue: process pixels further away from input mask first
   using node = std::pair<float, IndexType>;
   const auto cmp = [](const node & l, const node & r) { return l.first < r.first; };
   std::priority_queue<node, std::vector<node>, decltype(cmp)> queue(cmp);
@@ -200,7 +202,7 @@ FixTopologyCarveOutside<TInputImage, TOutputImage, TMaskImage>::ComputeThinImage
     n_it.SetLocation(idx);
     auto n = n_it.GetNeighborhood();
     for (auto & v : n.GetBufferReference())
-      v = (v != 0) ? FG : 1-FG;
+      v = (v != 0) ? FG : 1 - FG;
     return n;
   };
 
@@ -208,7 +210,7 @@ FixTopologyCarveOutside<TInputImage, TOutputImage, TMaskImage>::ComputeThinImage
   ProgressReporter progress(this, 0, mask_size, 100);
   while (!queue.empty())
   {
-    auto   idx = queue.top().second; // node
+    auto idx = queue.top().second; // node
     queue.pop();
 
     if (m_PaddedOutput->GetPixel(idx) != kVisited)
@@ -216,11 +218,9 @@ FixTopologyCarveOutside<TInputImage, TOutputImage, TMaskImage>::ComputeThinImage
 
     auto vals = get_mask(idx, 1);
 
-    // check if pixel can be eroded
     // check if point is simple (deletion does not change connectivity in the 3x3x3 neighborhood)
     if (topology::EulerInvariant(vals, 1) && topology::CCInvariant(vals, 1) && topology::CCInvariant(vals, 0))
     {
-      // We cannot delete current point, so reset
       m_PaddedOutput->SetPixel(idx, kBackground);
     }
 
@@ -242,16 +242,16 @@ FixTopologyCarveOutside<TInputImage, TOutputImage, TMaskImage>::ComputeThinImage
     progress.CompletedPixel();
   }
 
-	// copy to output
-	InputImagePointer input_image = dynamic_cast<const TInputImage*>(ProcessObject::GetInput(0));
-	itk::ImageRegionConstIterator<TInputImage> i_it(input_image, region);
-	itk::ImageRegionConstIterator<TMaskImage> s_it(m_PaddedOutput, region);
-	itk::ImageRegionIterator<TOutputImage> o_it(thin_image, region);
-	
-	for (i_it.GoToBegin(), s_it.GoToBegin(), o_it.GoToBegin(); !s_it.IsAtEnd(); ++i_it, ++s_it, ++o_it)
-	{
-		o_it.Set(s_it.Get() != ePixelState::kBackground ? m_InsideValue : i_it.Get());
-	}
+  // copy to output
+  InputImagePointer input_image = dynamic_cast<const TInputImage *>(ProcessObject::GetInput(0));
+  itk::ImageRegionConstIterator<TInputImage> i_it(input_image, region);
+  itk::ImageRegionConstIterator<TMaskImage>  s_it(m_PaddedOutput, region);
+  itk::ImageRegionIterator<TOutputImage>     o_it(thin_image, region);
+
+  for (i_it.GoToBegin(), s_it.GoToBegin(), o_it.GoToBegin(); !s_it.IsAtEnd(); ++i_it, ++s_it, ++o_it)
+  {
+    o_it.Set(s_it.Get() != ePixelState::kBackground ? m_InsideValue : i_it.Get());
+  }
 }
 
 template <class TInputImage, class TOutputImage, class TMaskImage>
@@ -264,26 +264,6 @@ FixTopologyCarveOutside<TInputImage, TOutputImage, TMaskImage>::GenerateData()
   this->PrepareData(progress);
 
   this->ComputeThinImage(progress);
-}
-
-template <class TInputImage, class TOutputImage, class TMaskImage>
-std::vector<float>
-FixTopologyCarveOutside<TInputImage, TOutputImage, TMaskImage>::GetNeighborDeltas(
-  const std::vector<OffsetType> & offsets,
-  const SpacingType &             spacing)
-{
-  std::vector<float> deltas;
-  for (const auto & offset : offsets)
-  {
-    float val = 0.f;
-    for (unsigned i = 0; i < ImageDimension; ++i)
-    {
-      float d = static_cast<float>(offset[i] * spacing[i]);
-      val += d * d;
-    }
-    deltas.push_back(std::sqrt(val));
-  }
-  return deltas;
 }
 
 template <class TInputImage, class TOutputImage, class TMaskImage>

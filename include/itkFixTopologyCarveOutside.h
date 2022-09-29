@@ -127,21 +127,17 @@ protected:
   void
   ComputeThinImage(ProgressAccumulator * progress);
 
-  using SpacingType = typename InputImageType::SpacingType;
-  using OffsetType = typename InputImageType::OffsetType;
-
-  std::vector<OffsetType>
+  std::vector<typename InputImageType::OffsetType>
   GetNeighborOffsets()
   {
     // 18-connectivity
+    using OffsetType = typename InputImageType::OffsetType;
     return { OffsetType{ -1, 0, 0 }, OffsetType{ 1, 0, 0 }, OffsetType{ 0, -1, 0 },  OffsetType{ 0, 1, 0 },
              OffsetType{ 0, 0, -1 }, OffsetType{ 0, 0, 1 }, OffsetType{ -1, -1, 0 }, OffsetType{ 1, -1, 0 },
              OffsetType{ -1, 1, 0 }, OffsetType{ 1, 1, 0 }, OffsetType{ 0, -1, -1 }, OffsetType{ 0, 1, -1 },
              OffsetType{ 0, -1, 1 }, OffsetType{ 0, 1, 1 }, OffsetType{ -1, 0, -1 }, OffsetType{ 1, 0, -1 },
              OffsetType{ -1, 0, 1 }, OffsetType{ 1, 0, 1 } };
   }
-  std::vector<float>
-  GetNeighborDeltas(const std::vector<OffsetType> & offsets, const SpacingType & spacing);
 
 private:
   ITK_DISALLOW_COPY_AND_ASSIGN(FixTopologyCarveOutside);

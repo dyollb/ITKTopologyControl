@@ -24,15 +24,6 @@ This is a module for the Insight Toolkit (ITK). The module includes a filter cal
     itk.imwrite(skull_mask_closed, 'skull_mask_closed.mha')
 ```
 
-Or using the pythonic API:
-
-```python
-    import itk
-    skull_mask = itk.imread('path/to/skull_with_holes.mha').astype(itk.US)
-    skull_mask_closed = itk.fix_topology_carve_outside(skull_mask, Radius=5)
-    itk.imwrite(skull_mask_closed, 'skull_mask_closed.mha')
-```
-
 Or using a custom mask (e.g. a sphere around a hole):
 
 ```python

@@ -102,7 +102,7 @@ itkFixTopologyCarveOutsideTest(int argc, char * argv[])
   else
   {
     const char * inputImageFileName = argv[2];
-    auto reader = itk::ImageFileReader<ImageType>::New();
+    auto         reader = itk::ImageFileReader<ImageType>::New();
     reader->SetFileName(inputImageFileName);
     reader->Update();
     image = reader->GetOutput();
