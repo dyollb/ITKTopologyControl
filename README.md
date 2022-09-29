@@ -1,7 +1,7 @@
 # ITKTopologyControl
 
 [![Build Status](https://github.com/dyollb/ITKTopologyControl/workflows/Build,%20test,%20package/badge.svg)](https://github.com/dyollb/ITKTopologyControl/actions)
-[![License](https://img.shields.io/github/license/dyollb/ITKTopologyControl?color=blue)](https://github.com/dyollb/ITKTopologyControl/blob/main/LICENSE)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://github.com/dyollb/ITKTopologyControl/blob/main/LICENSE)
 [![PyPI version](https://img.shields.io/pypi/v/itk-topologycontrol.svg)](https://badge.fury.io/py/itk-topologycontrol)
 
 ## Overview
@@ -13,9 +13,11 @@ This is a module for the Insight Toolkit (ITK). The module includes a filter cal
     skull_mask = itk.imread('path/to/skull_with_holes.mha').astype(itk.US)
 
     ImageType = type(skull_mask)
+    MaskType = itk.Image[itk.UC, 3]
 
-    top_control = itk.FixTopologyCarveOutside[ImageType, MaskType].New()
+    top_control = itk.FixTopologyCarveOutside[ImageType, ImageType, MaskType].New()
     top_control.SetInput(skull_mask)
+    top_control.SetRadius(5)
     top_control.Update()
     skull_mask_closed = top_control.GetOutput()
 
@@ -27,9 +29,21 @@ Or using the pythonic API:
 ```python
     import itk
     skull_mask = itk.imread('path/to/skull_with_holes.mha').astype(itk.US)
-    skull_mask_closed = itk.fix_topology_carve_outside(skull_mask)
+    skull_mask_closed = itk.fix_topology_carve_outside(skull_mask, Radius=5)
     itk.imwrite(skull_mask_closed, 'skull_mask_closed.mha')
 ```
+
+Or using a custom mask (e.g. a sphere around a hole):
+
+```python
+    import itk
+    custom_mask = itk.imread('path/to/custom_mask.mha').astype(itk.UC)
+    skull_mask = itk.imread('path/to/skull_with_holes.mha').astype(itk.US)
+    skull_mask_closed = itk.fix_topology_carve_outside(skull_mask, MaskImage=custom_mask, Radius=5)
+    itk.imwrite(skull_mask_closed, 'skull_mask_closed.mha')
+```
+
+![Closing holes in skull](doc/close_holes_skull.gif)
 
 ## Installation
 

@@ -13,7 +13,7 @@ except ImportError:
 
 setup(
     name="itk-topologycontrol",
-    version="0.1.0",
+    version="0.9.0",
     author="Bryn Lloyd",
     author_email="lloyd@itis.swiss",
     packages=["itk"],
