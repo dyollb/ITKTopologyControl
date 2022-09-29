@@ -6,7 +6,7 @@
 
 ## Overview
 
-This is a module for the Insight Toolkit (ITK). The module includes a filter called `FixTopologyCarveOutside` which works like morphological closing, except that in the "erode" phase topological constraints are enforced to avoid re-opening holes. It is able to close holes in thin layers (e.g. skull) with a minimal thickness.
+This is a module for the Insight Toolkit ([ITK](https://github.com/InsightSoftwareConsortium/ITK)). The module includes a filter called `FixTopologyCarveOutside` which works like morphological closing, except that in the "erode" phase topological constraints are enforced to avoid re-opening holes. It is able to close holes in thin layers (e.g. skull) with a minimal thickness.
 
 ```python
     import itk
