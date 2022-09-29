@@ -15,6 +15,7 @@
  *  limitations under the License.
  *
  *=========================================================================*/
+
 #ifndef itkFixTopologyCarveOutside_h
 #define itkFixTopologyCarveOutside_h
 
@@ -25,7 +26,7 @@
 
 namespace itk
 {
-/** \class FixTopologyCarveInside
+/** \class FixTopologyCarveOutside
  *
  * \brief This filter does morphological closing with topology constraints
  *

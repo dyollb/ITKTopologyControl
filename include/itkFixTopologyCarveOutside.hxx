@@ -15,6 +15,7 @@
  *  limitations under the License.
  *
  *=========================================================================*/
+
 #ifndef itkFixTopologyCarveOutside_hxx
 #define itkFixTopologyCarveOutside_hxx
 

@@ -11,8 +11,8 @@ set(TEST_DATA_ROOT "${TopologyControl_SOURCE_DIR}/Data")
 itk_add_test(NAME itkFixTopologyCarveOutsideTest
   COMMAND TopologyControlTestDriver
     --compare
-    ${TEST_DATA_ROOT}/{Baseline/itkFixTopologyCarveOutsideTestOutput.mha}
+    ${TEST_DATA_ROOT}/Baseline/itkFixTopologyCarveOutsideTestOutput.mha
     ${ITK_TEST_OUTPUT_DIR}/itkFixTopologyCarveOutsideTestOutput.mha
   itkFixTopologyCarveOutsideTest
     ${ITK_TEST_OUTPUT_DIR}/itkFixTopologyCarveOutsideTestOutput.mha
-  )
+)

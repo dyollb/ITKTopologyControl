@@ -1,25 +1,27 @@
 # -*- coding: utf-8 -*-
 from os import sys
+from pathlib import Path
 
 try:
     from skbuild import setup
 except ImportError:
-    print('scikit-build is required to build from source.', file=sys.stderr)
-    print('Please run:', file=sys.stderr)
-    print('', file=sys.stderr)
-    print('  python -m pip install scikit-build')
+    print("scikit-build is required to build from source.", file=sys.stderr)
+    print("Please run:", file=sys.stderr)
+    print("", file=sys.stderr)
+    print("  python -m pip install scikit-build")
     sys.exit(1)
 
 setup(
-    name='itk-topologycontrol',
-    version='0.1.0',
-    author='Bryn Lloyd',
-    author_email='lloyd@itis.swiss',
-    packages=['itk'],
-    package_dir={'itk': 'itk'},
-    download_url=r'https://github.com/dyollb/ITKTopologyControl',
-    description=r'ITK external module to control topology of binary mask regions',
-    long_description='ITK is an open-source, cross-platform library that provides developers with an extensive suite of software tools for image analysis. Developed through extreme programming methodologies, ITK employs leading-edge algorithms for registering and segmenting multidimensional scientific images.',
+    name="itk-topologycontrol",
+    version="0.1.0",
+    author="Bryn Lloyd",
+    author_email="lloyd@itis.swiss",
+    packages=["itk"],
+    package_dir={"itk": "itk"},
+    download_url=r"https://github.com/dyollb/ITKTopologyControl",
+    description=r"ITK external module to control topology of binary mask regions",
+    long_description=(Path(__file__).parent / "README.md").read_text(),
+    long_description_content_type="text/markdown",
     classifiers=[
         "License :: OSI Approved :: Apache Software License",
         "Programming Language :: Python",
@@ -37,12 +39,10 @@ setup(
         "Operating System :: Microsoft :: Windows",
         "Operating System :: POSIX",
         "Operating System :: Unix",
-        "Operating System :: MacOS"
-        ],
-    license='Apache',
-    keywords='ITK InsightToolkit',
-    url=r'https://itk.org/',
-    install_requires=[
-        r'itk>=5.3rc3'
-    ]
+        "Operating System :: MacOS",
+    ],
+    license="Apache",
+    keywords="ITK InsightToolkit",
+    url=r"https://github.com/dyollb/ITKTopologyControl",
+    install_requires=[r"itk>=5.2.1.post1"],
 )
