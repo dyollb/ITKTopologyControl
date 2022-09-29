@@ -30,8 +30,6 @@
 #include "itkNeighborhoodIterator.h"
 #include "itkSignedMaurerDistanceMapImageFilter.h"
 
-#include <iostream>
-
 namespace itk
 {
 

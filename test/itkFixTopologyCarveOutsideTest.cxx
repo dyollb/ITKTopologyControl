@@ -19,6 +19,7 @@
 #include "itkFixTopologyCarveOutside.h"
 
 #include "itkCommand.h"
+#include "itkImageFileReader.h"
 #include "itkImageFileWriter.h"
 #include "itkTestingMacros.h"
 
@@ -59,11 +60,11 @@ itkFixTopologyCarveOutsideTest(int argc, char * argv[])
   {
     std::cerr << "Missing parameters." << std::endl;
     std::cerr << "Usage: " << itkNameOfTestExecutableMacro(argv);
-    std::cerr << " outputImage";
+    std::cerr << " outputImage [inputImage]";
     std::cerr << std::endl;
-    //return EXIT_FAILURE;
+    return EXIT_FAILURE;
   }
-  const char * outputImageFileName = (argc >= 2) ? argv[1] : "foo.mha";
+  const char * outputImageFileName = (argc >= 2) ? argv[1] : "itkFixTopologyCarveOutsideTestOutput.mha";
 
   constexpr unsigned int Dimension = 3;
   using PixelType = int;
@@ -74,25 +75,37 @@ itkFixTopologyCarveOutsideTest(int argc, char * argv[])
 
   ITK_EXERCISE_BASIC_OBJECT_METHODS(filter, FixTopologyCarveOutside, ImageToImageFilter);
 
-  // Create input image to avoid test dependencies.
-  auto image = ImageType::New();
-  image->SetRegions({128, 128, 128});
-  image->Allocate();
-  image->FillBuffer(0);
-
-  ImageType::RegionType region;
-  region.SetIndex({0, 0, 20});
-  region.SetSize({128, 128, 1});
-  for (auto & pixel :  RangeType(*image, region))
+  ImageType::Pointer image;
+  if (argc <= 2)
   {
-    pixel = 1;
+    // Create input image to avoid test dependencies.
+    image = ImageType::New();
+    image->SetRegions({ 128, 128, 128 });
+    image->Allocate();
+    image->FillBuffer(0);
+
+    ImageType::RegionType region;
+    region.SetIndex({ 0, 0, 20 });
+    region.SetSize({ 128, 128, 1 });
+    for (auto & pixel : RangeType(*image, region))
+    {
+      pixel = 1;
+    }
+
+    region.SetIndex({ 45, 45, 20 });
+    region.SetSize({ 5, 5, 1 });
+    for (auto & pixel : RangeType(*image, region))
+    {
+      pixel = 0;
+    }
   }
-
-  region.SetIndex({45, 45, 20});
-  region.SetSize({5, 5, 1});
-  for (auto & pixel :  RangeType(*image, region))
+  else
   {
-    pixel = 0;
+    const char * inputImageFileName = argv[2];
+    auto reader = itk::ImageFileReader<ImageType>::New();
+    reader->SetFileName(inputImageFileName);
+    reader->Update();
+    image = reader->GetOutput();
   }
 
   ShowProgress::Pointer showProgress = ShowProgress::New();

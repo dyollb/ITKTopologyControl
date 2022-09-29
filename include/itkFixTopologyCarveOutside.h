@@ -27,13 +27,19 @@ namespace itk
 {
 /** \class FixTopologyCarveInside
  *
- * \brief This filter dilates the foreground, and then erodes from the "outside" while preserving the topology
+ * \brief This filter does morphological closing with topology constraints
  *
- * This filter implements ideas from:
+ * It works by doing following steps:
+ * 1. dilate the foreground
+ * 2. erode/carve the dilated voxels from the "outside" while preserving the topology of the dilated region.
  *
- * Vanderhyde, James. "Topology control of volumetric data."
- * PhD dissertation, Georgia Institute of Technology, 2007..
+ * The first step closes holes and the second returns as close as possible to the input mask, while ensuring that the
+ * holes are not re-opened.
  *
+ * This filter implements ideas from: Vanderhyde, James. "Topology control of volumetric data.", PhD dissertation,
+ * Georgia Institute of Technology, 2007..
+ *
+ * \author Bryn Lloyd
  * \ingroup TopologyControl
  */
 template <class TInputImage, class TOutputImage, class TMaskImage = itk::Image<unsigned char, 3>>
