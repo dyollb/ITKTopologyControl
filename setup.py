@@ -13,7 +13,7 @@ except ImportError:
 
 setup(
     name="itk-topologycontrol",
-    version="0.9.0",
+    version="1.0.0",
     author="Bryn Lloyd",
     author_email="lloyd@itis.swiss",
     packages=["itk"],
@@ -35,7 +35,6 @@ setup(
         "Topic :: Scientific/Engineering :: Medical Science Apps.",
         "Topic :: Scientific/Engineering :: Information Analysis",
         "Topic :: Software Development :: Libraries",
-        "Operating System :: Android",
         "Operating System :: Microsoft :: Windows",
         "Operating System :: POSIX",
         "Operating System :: Unix",
@@ -44,5 +43,5 @@ setup(
     license="Apache",
     keywords="ITK InsightToolkit",
     url=r"https://github.com/dyollb/ITKTopologyControl",
-    install_requires=[r"itk>=5.2.1.post1"],
+    install_requires=[r"itk-filtering>=5.2.1.post1"],
 )
