@@ -4,7 +4,7 @@
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://github.com/dyollb/ITKTopologyControl/blob/main/LICENSE)
 [![PyPI version](https://img.shields.io/pypi/v/itk-topologycontrol.svg)](https://badge.fury.io/py/itk-topologycontrol)
 <img src="https://img.shields.io/pypi/dm/itk-topologycontrol.svg?label=pypi%20downloads&logo=python&logoColor=green"/>
-<img src="https://img.shields.io/badge/python-%203.7%20|%203.8%20|%203.9%20-3776ab.svg"/>
+<img src="https://img.shields.io/badge/python-%203.7%20|%203.8%20|%203.9%20|%203.10%20|%203.11%20-3776ab.svg"/>
 
 ## Overview
 
