@@ -1,0 +1,6 @@
+itk_wrap_class("itk::FixTopologyBase" POINTER)
+  foreach(t ${WRAP_ITK_INT})
+    itk_wrap_template("${ITKM_I${t}3}" "${ITKT_I${t}3},${ITKT_I${t}3},${ITKT_IUC3}")
+  endforeach()
+itk_end_wrap_class()
+
