@@ -37,6 +37,8 @@ template <class TInputImage, class TOutputImage, class TMaskImage>
 class ITK_TEMPLATE_EXPORT FixTopologyBase : public ImageToImageFilter<TInputImage, TOutputImage>
 {
 public:
+  ITK_DISALLOW_COPY_AND_MOVE(FixTopologyBase);
+  
   /** Extract dimension from input and output image. */
   itkStaticConstMacro(InputImageDimension, unsigned int, TInputImage::ImageDimension);
   itkStaticConstMacro(OutputImageDimension, unsigned int, TOutputImage::ImageDimension);
@@ -144,9 +146,6 @@ protected:
 
   SizeValueType       m_Radius = 1;
   InputImagePixelType m_InsideValue = 1;
-
-private:
-  ITK_DISALLOW_COPY_AND_ASSIGN(FixTopologyBase);
 }; // end of FixTopologyBase class
 
 } // end namespace itk

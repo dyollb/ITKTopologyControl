@@ -23,13 +23,9 @@
 #include "TopologyInvariants.h"
 
 #include "itkBinaryDilateImageFilter.h"
-#include "itkConstantBoundaryCondition.h"
 #include "itkFlatStructuringElement.h"
 #include "itkImageLinearConstIteratorWithIndex.h"
-#include "itkImageRegionConstIterator.h"
-#include "itkImageRegionRange.h"
 #include "itkNeighborhoodIterator.h"
-#include "itkSignedMaurerDistanceMapImageFilter.h"
 
 namespace itk
 {

@@ -44,6 +44,8 @@ template <class TInputImage, class TOutputImage, class TMaskImage = itk::Image<u
 class ITK_TEMPLATE_EXPORT FixTopologyCarveOutside : public FixTopologyBase<TInputImage, TOutputImage, TMaskImage>
 {
 public:
+  ITK_DISALLOW_COPY_AND_MOVE(FixTopologyCarveOutside);
+  
   /** Extract dimension from input and output image. */
   itkStaticConstMacro(InputImageDimension, unsigned int, TInputImage::ImageDimension);
   itkStaticConstMacro(OutputImageDimension, unsigned int, TOutputImage::ImageDimension);
@@ -88,10 +90,6 @@ protected:
   ComputeThinImage(ProgressAccumulator * progress) override;
 
   using ePixelState = typename Superclass::ePixelState;
-
-private:
-  ITK_DISALLOW_COPY_AND_ASSIGN(FixTopologyCarveOutside);
-
 }; // end of FixTopologyCarveOutside class
 
 } // end namespace itk
