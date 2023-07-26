@@ -108,13 +108,13 @@ itkFixTopologyCarveOutsideTest(int argc, char * argv[])
     image = reader->GetOutput();
   }
 
-  ShowProgress::Pointer showProgress = ShowProgress::New();
+  auto showProgress = ShowProgress::New();
   filter->AddObserver(itk::ProgressEvent(), showProgress);
   filter->SetInput(image);
   filter->SetRadius(3);
+  ITK_TRY_EXPECT_NO_EXCEPTION(filter->Update());
 
-  using WriterType = itk::ImageFileWriter<ImageType>;
-  WriterType::Pointer writer = WriterType::New();
+  auto writer = itk::ImageFileWriter<ImageType>::New();
   writer->SetFileName(outputImageFileName);
   writer->SetInput(filter->GetOutput());
   writer->SetUseCompression(true);
