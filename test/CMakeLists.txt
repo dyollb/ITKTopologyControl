@@ -14,5 +14,5 @@ itk_add_test(NAME itkFixTopologyCarveOutsideTest
     DATA{Baseline/itkFixTopologyCarveOutsideTestOutput.mha}
     ${ITK_TEST_OUTPUT_DIR}/itkFixTopologyCarveOutsideTestOutput.mha
   itkFixTopologyCarveOutsideTest
-    DATA{Baseline/itkFixTopologyCarveOutsideTestOutput.mha}
+    ${ITK_TEST_OUTPUT_DIR}/itkFixTopologyCarveOutsideTestOutput.mha
 )
