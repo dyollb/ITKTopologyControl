@@ -73,7 +73,7 @@ itkFixTopologyCarveOutsideTest(int argc, char * argv[])
 
   auto filter = itk::FixTopologyCarveOutside<ImageType, ImageType>::New();
 
-  ITK_EXERCISE_BASIC_OBJECT_METHODS(filter, FixTopologyCarveOutside, ImageToImageFilter);
+  ITK_EXERCISE_BASIC_OBJECT_METHODS(filter, FixTopologyCarveOutside, FixTopologyBase);
 
   ImageType::Pointer image;
   if (argc <= 2)
