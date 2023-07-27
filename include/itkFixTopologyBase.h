@@ -38,7 +38,7 @@ class ITK_TEMPLATE_EXPORT FixTopologyBase : public ImageToImageFilter<TInputImag
 {
 public:
   ITK_DISALLOW_COPY_AND_MOVE(FixTopologyBase);
-  
+
   /** Extract dimension from input and output image. */
   itkStaticConstMacro(InputImageDimension, unsigned int, TInputImage::ImageDimension);
   itkStaticConstMacro(OutputImageDimension, unsigned int, TOutputImage::ImageDimension);
