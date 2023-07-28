@@ -43,6 +43,7 @@ FixTopologyCarveInside<TInputImage, TOutputImage, TMaskImage>::CreateDefaultMask
   erode->SetInput(this->m_PaddedOutput);
   erode->SetKernel(ball);
   erode->SetForegroundValue(ePixelState::kHardForeground);
+  erode->SetBackgroundValue(0);
   erode->Update();
   return erode->GetOutput();
 }
@@ -69,62 +70,17 @@ FixTopologyCarveInside<TInputImage, TOutputImage, TMaskImage>::ComputeThinImage(
     mask_size += (pixel == ePixelState::kSoftForeground) ? 1 : 0;
   }
 
-  std::vector<IndexType> seeds;
-  seeds.reserve(mask_size);
-  itk::ImageRegionConstIterator<MaskImageType> it(padded_output, region);
-  for (it.GoToBegin(); !it.IsAtEnd(); ++it)
-  {
-    if (it.Get() == ePixelState::kSoftForeground)
-    {
-      seeds.push_back(it.GetIndex());
-    }
-  }
-
   // process pixels further away from input background first
-  // - distance is positive outside
+  // - distance is negative inside
   // - use min priority queue
   using node = std::pair<float, IndexType>;
   const auto cmp = [](const node & l, const node & r) { return l.first > r.first; };
   std::priority_queue<node, std::vector<node>, decltype(cmp)> queue(cmp);
-  for (const auto & idx : seeds)
-  {
-    padded_output->SetPixel(idx, ePixelState::kQueued);
-    queue.push(std::make_pair(this->m_DistanceMap->GetPixel(idx), idx));
-  }
 
   auto         neighbors = this->GetNeighborOffsets();
   const size_t num_neighbors = neighbors.size();
 
-  NeighborhoodIteratorType n_it({ 1, 1, 1 }, padded_output, region);
-
-  const auto get_mask = [&n_it](const IndexType & idx, const int FG) {
-    n_it.SetLocation(idx);
-    auto n = n_it.GetNeighborhood();
-    for (auto & v : n.GetBufferReference())
-      v = (v != 0) ? FG : 1 - FG;
-    return n;
-  };
-
-  // erode while topology does not change
-  ProgressReporter progress(this, 0, mask_size, 100);
-  while (!queue.empty())
-  {
-    auto idx = queue.top().second; // node
-    queue.pop();
-
-    // skip if already processed
-    if (padded_output->GetPixel(idx) != ePixelState::kQueued)
-      continue;
-
-    auto vals = get_mask(idx, 1);
-
-    // check if point is simple (adding does not change connectivity in the 3x3x3 neighborhood)
-    if (topology::EulerInvariant(vals, 1) && topology::CCInvariant(vals, 1) && topology::CCInvariant(vals, 0))
-    {
-      padded_output->SetPixel(idx, ePixelState::kHardForeground);
-    }
-
-    // add unvisited neighbors to queue
+  auto add_neighbors = [&](const IndexType & idx) {
     for (size_t k = 0; k < num_neighbors; ++k)
     {
       const IndexType n_id = idx + neighbors[k];
@@ -139,6 +95,49 @@ FixTopologyCarveInside<TInputImage, TOutputImage, TMaskImage>::ComputeThinImage(
         queue.push(std::make_pair(n_dist, n_id));
       }
     }
+  };
+
+  // initial seeds
+  itk::ImageRegionConstIterator<MaskImageType> it(padded_output, region);
+  for (it.GoToBegin(); !it.IsAtEnd(); ++it)
+  {
+    if (it.Get() == ePixelState::kHardForeground)
+    {
+      add_neighbors(it.GetIndex());
+    }
+  }
+
+  NeighborhoodIteratorType n_it({ 1, 1, 1 }, padded_output, region);
+
+  const auto get_mask = [&n_it](const IndexType & idx) {
+    n_it.SetLocation(idx);
+    auto n = n_it.GetNeighborhood();
+    for (auto & v : n.GetBufferReference())
+      v = (v == ePixelState::kHardForeground) ? 1 : 0;
+    return n;
+  };
+
+  // dilate while topology does not change
+  ProgressReporter progress(this, 0, mask_size, 100);
+  while (!queue.empty())
+  {
+    auto idx = queue.top().second; // node
+    queue.pop();
+
+    // skip if already processed
+    if (padded_output->GetPixel(idx) != ePixelState::kQueued)
+      continue;
+
+    auto vals = get_mask(idx);
+
+    // check if point is simple (deletion does not change connectivity in the 3x3x3 neighborhood)
+    if (topology::EulerInvariant(vals, 0) && topology::CCInvariant(vals, 0))
+    {
+      padded_output->SetPixel(idx, ePixelState::kHardForeground);
+    }
+
+    // add unvisited neighbors to queue
+    add_neighbors(idx);
     progress.CompletedPixel();
   }
 
@@ -150,7 +149,7 @@ FixTopologyCarveInside<TInputImage, TOutputImage, TMaskImage>::ComputeThinImage(
 
   for (i_it.GoToBegin(), s_it.GoToBegin(), o_it.GoToBegin(); !s_it.IsAtEnd(); ++i_it, ++s_it, ++o_it)
   {
-    o_it.Set(s_it.Get() == ePixelState::kHardForeground ? this->m_InsideValue : i_it.Get());
+    o_it.Set(s_it.Get() == ePixelState::kHardForeground ? this->m_InsideValue : 0);
   }
 }
 

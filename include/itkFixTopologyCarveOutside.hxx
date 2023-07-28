@@ -127,11 +127,11 @@ FixTopologyCarveOutside<TInputImage, TOutputImage, TMaskImage>::ComputeThinImage
 
   NeighborhoodIteratorType n_it({ 1, 1, 1 }, padded_output, region);
 
-  const auto get_mask = [&n_it](const IndexType & idx, const int FG) {
+  const auto get_mask = [&n_it](const IndexType & idx) {
     n_it.SetLocation(idx);
     auto n = n_it.GetNeighborhood();
     for (auto & v : n.GetBufferReference())
-      v = (v != 0) ? FG : 1 - FG;
+      v = (v != 0) ? 1 : 0;
     return n;
   };
 
@@ -145,7 +145,7 @@ FixTopologyCarveOutside<TInputImage, TOutputImage, TMaskImage>::ComputeThinImage
     if (padded_output->GetPixel(idx) != ePixelState::kQueued)
       continue;
 
-    auto vals = get_mask(idx, 1);
+    auto vals = get_mask(idx);
 
     // check if point is simple (deletion does not change connectivity in the 3x3x3 neighborhood)
     if (topology::EulerInvariant(vals, 1) && topology::CCInvariant(vals, 1) && topology::CCInvariant(vals, 0))

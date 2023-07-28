@@ -31,7 +31,7 @@ EulerInvariant(const TNeighborhood & neighbors, const TLabel label)
 
   // Here we count only the changes at the center voxel.
   // ==> If we mark the center as BG, then P, F, E and V are '0'.
-  static const int c = 27 / 2;
+  static constexpr int c = 27 / 2;
 
   assert(neighbors[c] == label);
 
