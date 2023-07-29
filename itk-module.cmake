@@ -21,8 +21,6 @@ itk_module(TopologyControl
   TEST_DEPENDS
     ITKTestKernel
     ITKMetaIO
-  FACTORY_NAMES
-    ImageIO::Meta
   DESCRIPTION
     "${DOCUMENTATION}"
   EXCLUDE_FROM_DEFAULT
