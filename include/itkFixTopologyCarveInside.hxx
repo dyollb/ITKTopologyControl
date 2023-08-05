@@ -118,27 +118,44 @@ FixTopologyCarveInside<TInputImage, TOutputImage, TMaskImage>::ComputeThinImage(
   };
 
   // dilate while topology does not change
-  ProgressReporter progress(this, 0, mask_size, 100);
-  while (!queue.empty())
+  while (true)
   {
-    auto idx = queue.top().second; // node
-    queue.pop();
+    int num_changed = 0;
 
-    // skip if already processed
-    if (padded_output->GetPixel(idx) != ePixelState::kQueued)
-      continue;
-
-    auto vals = get_mask(idx);
-
-    // check if point is simple (deletion does not change connectivity in the 3x3x3 neighborhood)
-    if (topology::EulerInvariant(vals, 0) && topology::CCInvariant(vals, 0))
+    ProgressReporter progress(this, 0, mask_size, 100);
+    while (!queue.empty())
     {
-      padded_output->SetPixel(idx, ePixelState::kHardForeground);
+      auto idx = queue.top().second; // node
+      queue.pop();
+
+      // skip if already processed
+      if (padded_output->GetPixel(idx) != ePixelState::kQueued)
+        continue;
+
+      auto vals = get_mask(idx);
+
+      // check if point is simple (deletion does not change connectivity in the 3x3x3 neighborhood)
+      if (topology::EulerInvariant(vals, 0) && topology::CCInvariant(vals, 0))
+      {
+        padded_output->SetPixel(idx, ePixelState::kHardForeground);
+        num_changed++;
+      }
+
+      // add unvisited neighbors to queue
+      add_neighbors(idx);
+      progress.CompletedPixel();
     }
 
-    // add unvisited neighbors to queue
-    add_neighbors(idx);
-    progress.CompletedPixel();
+    if (num_changed == 0)
+      break;
+
+    for (it.GoToBegin(); !it.IsAtEnd(); ++it)
+    {
+      if (it.Get() == ePixelState::kQueued)
+      {
+        queue.push(std::make_pair(this->m_DistanceMap->GetPixel(it.GetIndex()), it.GetIndex()));
+      }
+    }
   }
 
   // copy to output

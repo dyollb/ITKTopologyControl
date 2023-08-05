@@ -109,27 +109,6 @@ itkFixTopologyCarveInsideTest(int argc, char * argv[])
 
     image->SetPixel({ 40, 24, 24 }, 1);
     image->SetPixel({ 41, 24, 24 }, 1);
-
-    using IndexType = ImageType::IndexType;
-    using NeighborhoodIteratorType = itk::NeighborhoodIterator<ImageType, itk::ConstantBoundaryCondition<ImageType>>;
-    NeighborhoodIteratorType n_it({ 1, 1, 1 }, image, region);
-
-    const auto get_mask = [&n_it](const IndexType & idx, const int FG) {
-      n_it.SetLocation(idx);
-      auto n = n_it.GetNeighborhood();
-      for (auto & v : n.GetBufferReference())
-        v = (v == 1) ? FG : 1 - FG;
-      return n;
-    };
-    auto vals = get_mask({ 40, 24, 24 }, 1);
-
-    std::cerr << "topology::EulerInvariant(vals, 0): " << topology::EulerInvariant(vals, 0) << "\n";
-    std::cerr << "topology::EulerInvariant(vals, 1): " << topology::EulerInvariant(vals, 1) << "\n";
-    std::cerr << "topology::CCInvariant(vals, 0): " << topology::CCInvariant(vals, 0) << "\n";
-    std::cerr << "topology::CCInvariant(vals, 1): " << topology::CCInvariant(vals, 1) << "\n";
-    std::cerr << "topology::NonmanifoldRemove(vals, 0): " << topology::NonmanifoldRemove(vals, 0) << "\n";
-    std::cerr << "topology::NonmanifoldRemove(vals, 1): " << topology::NonmanifoldRemove(vals, 1) << "\n";
-
   }
   else
   {
@@ -140,10 +119,10 @@ itkFixTopologyCarveInsideTest(int argc, char * argv[])
     image = reader->GetOutput();
   }
 
-
   auto mask = FilterType::MaskImageType::New();
   mask->SetRegions(image->GetBufferedRegion().GetSize());
   mask->Allocate();
+  mask->CopyInformation(image);
   mask->FillBuffer(0);
   mask->SetPixel({ 30, 30, 30 }, 1);
   mask->SetPixel({ 51, 30, 30 }, 1);
@@ -151,7 +130,10 @@ itkFixTopologyCarveInsideTest(int argc, char * argv[])
   auto showProgress = ShowProgress::New();
   // filter->AddObserver(itk::ProgressEvent(), showProgress);
   filter->SetInput(image);
-  filter->SetMaskImage(mask);
+  if (argc <= 2)
+    filter->SetMaskImage(mask);
+  else
+    filter->SetRadius(5);
 
   auto writer = itk::ImageFileWriter<ImageType>::New();
   writer->SetFileName(outputImageFileName);
