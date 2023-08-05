@@ -151,6 +151,7 @@ FixTopologyCarveOutside<TInputImage, TOutputImage, TMaskImage>::ComputeThinImage
     if (topology::EulerInvariant(vals, 1) && topology::CCInvariant(vals, 1) && topology::CCInvariant(vals, 0))
     {
       padded_output->SetPixel(idx, ePixelState::kBackground);
+      progress.CompletedPixel();
     }
 
     // add unvisited neighbors to queue
@@ -168,7 +169,6 @@ FixTopologyCarveOutside<TInputImage, TOutputImage, TMaskImage>::ComputeThinImage
         queue.push(std::make_pair(n_dist, n_id));
       }
     }
-    progress.CompletedPixel();
   }
 
   // copy to output

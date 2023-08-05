@@ -128,7 +128,7 @@ itkFixTopologyCarveInsideTest(int argc, char * argv[])
   mask->SetPixel({ 51, 30, 30 }, 1);
 
   auto showProgress = ShowProgress::New();
-  // filter->AddObserver(itk::ProgressEvent(), showProgress);
+  filter->AddObserver(itk::ProgressEvent(), showProgress);
   filter->SetInput(image);
   if (argc <= 2)
     filter->SetMaskImage(mask);

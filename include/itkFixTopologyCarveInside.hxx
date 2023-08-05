@@ -118,11 +118,11 @@ FixTopologyCarveInside<TInputImage, TOutputImage, TMaskImage>::ComputeThinImage(
   };
 
   // dilate while topology does not change
+  ProgressReporter progress(this, 0, mask_size, 100);
   while (true)
   {
     int num_changed = 0;
 
-    ProgressReporter progress(this, 0, mask_size, 100);
     while (!queue.empty())
     {
       auto idx = queue.top().second; // node
@@ -138,12 +138,12 @@ FixTopologyCarveInside<TInputImage, TOutputImage, TMaskImage>::ComputeThinImage(
       if (topology::EulerInvariant(vals, 0) && topology::CCInvariant(vals, 0))
       {
         padded_output->SetPixel(idx, ePixelState::kHardForeground);
+        progress.CompletedPixel();
         num_changed++;
       }
 
       // add unvisited neighbors to queue
       add_neighbors(idx);
-      progress.CompletedPixel();
     }
 
     if (num_changed == 0)
