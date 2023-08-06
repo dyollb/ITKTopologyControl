@@ -16,20 +16,20 @@
  *
  *=========================================================================*/
 
-#ifndef itkFixTopologyCarveOutside_h
-#define itkFixTopologyCarveOutside_h
+#ifndef itkFixTopologyCarveInside_h
+#define itkFixTopologyCarveInside_h
 
 #include "itkFixTopologyBase.h"
 
 namespace itk
 {
-/** \class FixTopologyCarveOutside
+/** \class FixTopologyCarveInside
  *
- * \brief This filter does morphological closing with topology constraints
+ * \brief This filter does morphological opening with topology constraints
  *
  * It works by doing following steps:
- * 1. dilate the foreground
- * 2. erode/carve the dilated voxels from the "outside" while preserving the topology of the dilated region.
+ * 1. ...
+ * 2. ...
  *
  * The first step closes holes and the second returns as close as possible to the input mask, while ensuring that the
  * holes are not re-opened.
@@ -41,10 +41,10 @@ namespace itk
  * \ingroup TopologyControl
  */
 template <class TInputImage, class TOutputImage, class TMaskImage = itk::Image<unsigned char, 3>>
-class ITK_TEMPLATE_EXPORT FixTopologyCarveOutside : public FixTopologyBase<TInputImage, TOutputImage, TMaskImage>
+class ITK_TEMPLATE_EXPORT FixTopologyCarveInside : public FixTopologyBase<TInputImage, TOutputImage, TMaskImage>
 {
 public:
-  ITK_DISALLOW_COPY_AND_MOVE(FixTopologyCarveOutside);
+  ITK_DISALLOW_COPY_AND_MOVE(FixTopologyCarveInside);
 
   /** Extract dimension from input and output image. */
   itkStaticConstMacro(InputImageDimension, unsigned int, TInputImage::ImageDimension);
@@ -53,7 +53,7 @@ public:
   static const unsigned int ImageDimension = InputImageDimension;
 
   /** Standard class typedefs. */
-  using Self = FixTopologyCarveOutside;
+  using Self = FixTopologyCarveInside;
   using Superclass = FixTopologyBase<TInputImage, TOutputImage, TMaskImage>;
   using Pointer = SmartPointer<Self>;
   using ConstPointer = SmartPointer<const Self>;
@@ -62,7 +62,7 @@ public:
   itkNewMacro(Self);
 
   /** Run-time type information (and related methods). */
-  itkTypeMacro(FixTopologyCarveOutside, FixTopologyBase);
+  itkTypeMacro(FixTopologyCarveInside, FixTopologyBase);
 
   /** Type for input image. */
   using InputImageType = TInputImage;
@@ -80,8 +80,8 @@ public:
   using OutputImagePointer = typename OutputImageType::Pointer;
 
 protected:
-  FixTopologyCarveOutside() = default;
-  ~FixTopologyCarveOutside() override = default;
+  FixTopologyCarveInside() = default;
+  ~FixTopologyCarveInside() override = default;
 
   MaskImageType *
   CreateDefaultMask(ProgressAccumulator * progress) override;
@@ -90,12 +90,12 @@ protected:
   ComputeThinImage(ProgressAccumulator * progress) override;
 
   using ePixelState = typename Superclass::ePixelState;
-}; // end of FixTopologyCarveOutside class
+}; // end of FixTopologyCarveInside class
 
 } // end namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION
-#  include "itkFixTopologyCarveOutside.hxx"
+#  include "itkFixTopologyCarveInside.hxx"
 #endif
 
-#endif // itkFixTopologyCarveOutside
+#endif // itkFixTopologyCarveInside

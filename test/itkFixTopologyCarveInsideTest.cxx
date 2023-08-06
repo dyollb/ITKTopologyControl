@@ -16,7 +16,7 @@
  *
  *=========================================================================*/
 
-#include "itkFixTopologyCarveOutside.h"
+#include "itkFixTopologyCarveInside.h"
 
 #include "itkCommand.h"
 #include "itkImageFileReader.h"
@@ -54,7 +54,7 @@ public:
 } // namespace
 
 int
-itkFixTopologyCarveOutsideTest(int argc, char * argv[])
+itkFixTopologyCarveInsideTest(int argc, char * argv[])
 {
   if (argc < 2)
   {
@@ -64,16 +64,17 @@ itkFixTopologyCarveOutsideTest(int argc, char * argv[])
     std::cerr << std::endl;
     return EXIT_FAILURE;
   }
-  const char * outputImageFileName = (argc >= 2) ? argv[1] : "itkFixTopologyCarveOutsideTestOutput.mha";
+  const char * outputImageFileName = (argc >= 2) ? argv[1] : "itkFixTopologyCarveInsideTestOutput.mha";
 
   constexpr unsigned int Dimension = 3;
   using PixelType = int;
   using ImageType = itk::Image<PixelType, Dimension>;
   using RangeType = itk::ImageRegionRange<ImageType>;
+  using FilterType = itk::FixTopologyCarveInside<ImageType, ImageType>;
 
-  auto filter = itk::FixTopologyCarveOutside<ImageType, ImageType>::New();
+  auto filter = FilterType::New();
 
-  ITK_EXERCISE_BASIC_OBJECT_METHODS(filter, FixTopologyCarveOutside, FixTopologyBase);
+  ITK_EXERCISE_BASIC_OBJECT_METHODS(filter, FixTopologyCarveInside, FixTopologyBase);
 
   ImageType::Pointer image;
   if (argc <= 2)
@@ -85,19 +86,29 @@ itkFixTopologyCarveOutsideTest(int argc, char * argv[])
     image->FillBuffer(0);
 
     ImageType::RegionType region;
-    region.SetIndex({ 0, 0, 20 });
-    region.SetSize({ 128, 128, 1 });
+    region.SetIndex({ 20, 20, 20 });
+    region.SetSize({ 20, 20, 20 });
     for (auto & pixel : RangeType(*image, region))
     {
       pixel = 1;
     }
 
-    region.SetIndex({ 45, 45, 20 });
-    region.SetSize({ 5, 5, 1 });
+    region.SetIndex({ 42, 20, 20 });
+    region.SetSize({ 20, 20, 20 });
     for (auto & pixel : RangeType(*image, region))
     {
-      pixel = 0;
+      pixel = 1;
     }
+
+    region.SetIndex({ 40, 34, 34 });
+    region.SetSize({ 2, 5, 5 });
+    for (auto & pixel : RangeType(*image, region))
+    {
+      pixel = 1;
+    }
+
+    image->SetPixel({ 40, 24, 24 }, 1);
+    image->SetPixel({ 41, 24, 24 }, 1);
   }
   else
   {
@@ -108,10 +119,21 @@ itkFixTopologyCarveOutsideTest(int argc, char * argv[])
     image = reader->GetOutput();
   }
 
+  auto mask = FilterType::MaskImageType::New();
+  mask->SetRegions(image->GetBufferedRegion().GetSize());
+  mask->Allocate();
+  mask->CopyInformation(image);
+  mask->FillBuffer(0);
+  mask->SetPixel({ 30, 30, 30 }, 1);
+  mask->SetPixel({ 51, 30, 30 }, 1);
+
   auto showProgress = ShowProgress::New();
   filter->AddObserver(itk::ProgressEvent(), showProgress);
   filter->SetInput(image);
-  filter->SetRadius(3);
+  if (argc <= 2)
+    filter->SetMaskImage(mask);
+  else
+    filter->SetRadius(5);
 
   auto writer = itk::ImageFileWriter<ImageType>::New();
   writer->SetFileName(outputImageFileName);
